@@ -54,14 +54,14 @@ export default function Home() {
             </List>
 
             <TableContainer aria-label="Time table" ref={tableRef} component={Paper} sx={{ height: "66vh", border: 1, borderColor: "divider", borderRadius: 3, visibility: positioned ? "visible" : "hidden" }}>
-                <Table stickyHeader>
-                    <TableHead ref={headRef}>
+                <Table size="small" stickyHeader>
+                    <TableHead>
                         <TableRow>
-                            <TableCell sx={{ width: "20%", minWidth: 80 }}>Date</TableCell>
+                            <TableCell ref={headRef} sx={{ width: "15%", minWidth: 80 }}>Date</TableCell>
                             <TableCell sx={{ width: "10%", minWidth: 70 }}>Start</TableCell>
                             <TableCell sx={{ width: "10%", minWidth: 70 }}>End</TableCell>
                             <TableCell sx={{ width: "15%", minWidth: 80 }}>Code</TableCell>
-                            <TableCell sx={{ width: "45%", minWidth: 500 }}>Name</TableCell>
+                            <TableCell sx={{ width: "50%", minWidth: 500 }}>Name</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>{rows.map(row => {
@@ -75,10 +75,10 @@ export default function Home() {
                         const rowWeight = rowColor.includes("text") ? 400 : 700;
                         return (
                             <TableRow hover key={row.id} ref={el => el ? rowRefs.current.set(row.id, el) : rowRefs.current.delete(row.id)}>
-                                <TableCell sx={{ color: rowColor, display: { xs: "table-cell", md: "none" }, fontWeight: rowWeight }}>
+                                <TableCell sx={{ color: rowColor, display: { xs: "table-cell", lg: "none" }, fontWeight: rowWeight }}>
                                     {`${parts.day} ${parts.month}`}
                                 </TableCell>
-                                <TableCell sx={{ color: rowColor, display: { xs: "none", md: "table-cell" }, fontWeight: rowWeight }}>
+                                <TableCell sx={{ color: rowColor, display: { xs: "none", lg: "table-cell" }, fontWeight: rowWeight }}>
                                     {`${parts.day} ${parts.month} ${parts.year} (${parts.weekday})`}
                                 </TableCell>
                                 <TableCell sx={{ color: rowColor, fontWeight: rowWeight }}>{timeFormat.format(row.start)}</TableCell>
