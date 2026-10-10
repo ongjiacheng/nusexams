@@ -21,7 +21,7 @@ export default function Home() {
     const dateFormat = new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
     const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Singapore" });
     const visible = rows.filter(row => {
-        const keywords = [dateFormat.format(row.start), row.code, ...row.name.split(" ")].map(k => k.toUpperCase());
+        const keywords = [...dateFormat.format(row.start).split(" "), row.code, ...row.name.split(" ")].map(k => k.toUpperCase());
         return query.trim().toUpperCase().split(" ").every(
             term => keywords.some(word => word.startsWith(term))
         )
