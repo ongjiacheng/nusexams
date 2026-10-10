@@ -21,8 +21,10 @@ export default function Home() {
     const dateFormat = new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
     const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Singapore" });
     const visible = rows.filter(row => {
-        const keywords = [dateFormat.format(row.start), row.code, row.name].map(k => k.toUpperCase());
-        return keywords.some(keyword => keyword.startsWith(query.trim().toUpperCase()));
+        const keywords = [dateFormat.format(row.start), row.code, ...row.name.split(" ")].map(k => k.toUpperCase());
+        return query.trim().toUpperCase().split(" ").every(
+            term => keywords.some(word => word.startsWith(term))
+        )
     });
 
     useEffect(() => {
@@ -63,7 +65,7 @@ export default function Home() {
                 }}
                 sx={{ mb: 2, width: "100%" }}
             />
-
+            {!positioned && "Loading..."}
             <TableContainer aria-label="Time table" ref={tableRef} component={Paper} sx={{ flex: 1, minHeight: 0, border: 1, borderColor: "divider", borderRadius: 3, visibility: positioned ? "visible" : "hidden" }}>
                 <Table size="small" stickyHeader>
                     <TableHead>
