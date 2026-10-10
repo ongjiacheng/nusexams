@@ -21,9 +21,9 @@ export default function Home() {
     const dateFormat = new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
     const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
     const visible = rows.filter(row => {
-        keywords = [dateFormat.format(row.start).toUpperCase(), row.code.toUpperCase()].concat(row.name.split(" "));
-        return keywords.some(keyword => keyword.startWith(query.trim().toUpperCase()));
-    })
+        const keywords = [dateFormat.format(row.start), row.code, ...row.name.split(" ")].map(k => k.toUpperCase());
+        return keywords.some(keyword => keyword.startsWith(query.trim().toUpperCase()));
+    });
 
     useEffect(() => {
         const target = rowRefs.current.get(rows.find(row => row.start.toISOString().slice(0, 10) >= now.toISOString().slice(0, 10)).id);
