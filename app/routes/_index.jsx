@@ -45,16 +45,16 @@ export default function Home() {
     }, []);
 
     return (
-        <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-            <Typography component="h1" color="text.primary" variant="h4" sx={{ fontWeight: 700, my: 2 }}>
+        <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 }, height: "100dvh", display: "flex", flexDirection: "column" }}>
+            <Typography component="h1" color="text.primary" variant="h4" sx={{ fontWeight: 700, my: 0.5 }}>
                 NUS Exam Time Table
             </Typography>
-            <List dense aria-label="Legend" sx={{ display: "flex", flexWrap: "wrap", fontWeight: 700, my: 0.5, "& .MuiListItem-root": { py: 0.25, px: 1, "&:first-of-type": { pl: 0 } } }}>
-                <ListItem sx={{ width: "auto", color: "text.primary" }}>Today:</ListItem>
-                <ListItem sx={{ width: "auto", color: "success.dark" }}>● Soon</ListItem>
-                <ListItem sx={{ width: "auto", color: "warning.dark" }}>● Next</ListItem>
-                <ListItem sx={{ width: "auto", color: "error.dark" }}>● Started</ListItem>
-                <ListItem sx={{ width: "auto", color: "info.dark" }}>● Ended</ListItem>
+            <List dense aria-label="Legend" sx={{ display: "flex", flexWrap: "wrap", fontWeight: 700, my: 0.5 }}>
+                <ListItem sx={{ px: 1, width: "auto", color: "text.primary" }}>Today:</ListItem>
+                <ListItem sx={{ px: 1, width: "auto", color: "success.dark" }}>● Soon</ListItem>
+                <ListItem sx={{ px: 1, width: "auto", color: "warning.dark" }}>● Next</ListItem>
+                <ListItem sx={{ px: 1, width: "auto", color: "error.dark" }}>● Started</ListItem>
+                <ListItem sx={{ px: 1, width: "auto", color: "info.dark" }}>● Ended</ListItem>
             </List>
 
             <TextField size="small" label="Search exam date & course code (e.g. CS1010, 21 Nov)" type="search" value={query}
@@ -65,7 +65,7 @@ export default function Home() {
                 sx={{ mb: 2, width: "100%" }}
             />
 
-            <TableContainer aria-label="Time table" ref={tableRef} component={Paper} sx={{ height: "66vh", border: 1, borderColor: "divider", borderRadius: 3, visibility: positioned ? "visible" : "hidden" }}>
+            <TableContainer aria-label="Time table" ref={tableRef} component={Paper} sx={{ flex: 1, minHeight: 0, border: 1, borderColor: "divider", borderRadius: 3, visibility: positioned ? "visible" : "hidden" }}>
                 <Table size="small" stickyHeader>
                     <TableHead>
                         <TableRow>
