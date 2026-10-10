@@ -49,9 +49,6 @@ export default function Home() {
             <Typography component="h1" color="text.primary" variant="h4" sx={{ fontWeight: 700, my: 2 }}>
                 NUS Exam Time Table
             </Typography>
-            <Typography component="h2" color="text.secondary">
-                NUS exam dates for AY 2026 / 2027.
-            </Typography>
             <List dense aria-label="Legend" sx={{ display: "flex", flexWrap: "wrap", fontWeight: 700, my: 0.5, "& .MuiListItem-root": { py: 0.25, px: 1, "&:first-of-type": { pl: 0 } } }}>
                 <ListItem sx={{ width: "auto", color: "text.primary" }}>Today:</ListItem>
                 <ListItem sx={{ width: "auto", color: "success.dark" }}>● Soon</ListItem>
