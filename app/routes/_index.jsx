@@ -20,9 +20,10 @@ export default function Home() {
     }));
     const dateFormat = new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
     const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
-    const visible = rows.filter(row =>
-        row.code.toUpperCase().startsWith(query.trim().toUpperCase()) || dateFormat.format(row.start).toUpperCase().startsWith(query.trim().toUpperCase())
-    );
+    const visible = rows.filter(row => {
+        keywords = [dateFormat.format(row.start).toUpperCase(), row.code.toUpperCase()].concat(row.name.split(" "));
+        return keywords.some(keyword => keyword.startWith(query.trim().toUpperCase()));
+    })
 
     useEffect(() => {
         const target = rowRefs.current.get(rows.find(row => row.start.toISOString().slice(0, 10) >= now.toISOString().slice(0, 10)).id);
@@ -55,7 +56,7 @@ export default function Home() {
                 <ListItem sx={{ px: 1, width: "auto", color: "info.dark" }}>● Ended</ListItem>
             </List>
 
-            <TextField size="small" label="Search exam date & course code (e.g. CS1010, 21 Nov)" type="search" value={query}
+            <TextField size="small" label="Search exam date, course code, or course name" type="search" value={query}
                 onChange={event => {
                     setQuery(event.target.value);
                     tableRef.current.scrollTop = 0;
@@ -79,7 +80,6 @@ export default function Home() {
                             <TableCell colSpan={5} align="center" sx={{ color: "text.secondary" }}>No matching courses</TableCell>
                         </TableRow>
                     )}{visible.map(row => {
-                        const parts = Object.fromEntries(dateFormat.formatToParts(row.start).map(({ type, value }) => [type, value]));
                         const rowColor = row.start.toISOString().slice(0, 10) < now.toISOString().slice(0, 10) ? "text.disabled"
                             : row.start.toISOString().slice(0, 10) > now.toISOString().slice(0, 10) ? "text.primary"
                                 : row.end <= now ? "info.dark"
@@ -90,10 +90,10 @@ export default function Home() {
                         return (
                             <TableRow hover key={row.id} ref={el => el ? rowRefs.current.set(row.id, el) : rowRefs.current.delete(row.id)}>
                                 <TableCell sx={{ color: rowColor, display: { xs: "table-cell", lg: "none" }, fontWeight: rowWeight }}>
-                                    {`${parts.day} ${parts.month}`}
+                                    {`${row.start.getDate()} ${row.start.toLocaleString('en-SG', { month: 'short' })}`}
                                 </TableCell>
                                 <TableCell sx={{ color: rowColor, display: { xs: "none", lg: "table-cell" }, fontWeight: rowWeight }}>
-                                    {`${parts.day} ${parts.month} ${parts.year} (${parts.weekday})`}
+                                    {`${row.start.getDate()} ${row.start.toLocaleString('en-SG', { month: 'short' })} ${row.start.getFullYear()} (${row.start.toLocaleDateString('en-SG', { weekday: 'short' })})`}
                                 </TableCell>
                                 <TableCell sx={{ color: rowColor, fontWeight: rowWeight }}>{timeFormat.format(row.start)}</TableCell>
                                 <TableCell sx={{ color: rowColor, fontWeight: rowWeight }}>{timeFormat.format(row.end)}</TableCell>
