@@ -1,5 +1,5 @@
 import exams from "../assets/exam_2627.json";
-import { Container, Link, List, ListItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Container, Link, List, ListItem, Paper, Table, TextField, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
@@ -7,6 +7,7 @@ export default function Home() {
     const headRef = useRef(null);
     const rowRefs = useRef(new Map());
     const [positioned, setPositioned] = useState(false);
+    const [query, setQuery] = useState("");
     const [now, setNow] = useState(() => new Date(Date.now() + 8 * 60 * 60_000));
     const rows = exams.flatMap(slot => slot.modules.map(module => {
         return {
@@ -19,6 +20,11 @@ export default function Home() {
     }));
     const dateFormat = new Intl.DateTimeFormat("en-SG", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
     const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
+    const terms = query.toUpperCase().split(/\s+/).filter(Boolean);
+    const visible = rows.filter(row => {
+        const text = `${dateFormat.format(row.start)} ${row.code}`.toUpperCase();
+        return terms.every(term => text.includes(term));
+    });
 
     useEffect(() => {
         const target = rowRefs.current.get(rows.find(row => row.start.toISOString().slice(0, 10) >= now.toISOString().slice(0, 10)).id);
@@ -46,12 +52,21 @@ export default function Home() {
             <Typography component="h2" color="text.secondary">
                 NUS exam dates for AY 2026 / 2027.
             </Typography>
-            <List aria-label="Legend" sx={{ display: "flex", flexWrap: "wrap", fontWeight: 700 }}>
+            <List dense aria-label="Legend" sx={{ display: "flex", flexWrap: "wrap", fontWeight: 700, my: 0.5, "& .MuiListItem-root": { py: 0.25, px: 1, "&:first-of-type": { pl: 0 } } }}>
+                <ListItem sx={{ width: "auto", color: "text.primary" }}>Today:</ListItem>
                 <ListItem sx={{ width: "auto", color: "success.dark" }}>● Soon</ListItem>
                 <ListItem sx={{ width: "auto", color: "warning.dark" }}>● Next</ListItem>
                 <ListItem sx={{ width: "auto", color: "error.dark" }}>● Started</ListItem>
                 <ListItem sx={{ width: "auto", color: "info.dark" }}>● Ended</ListItem>
             </List>
+
+            <TextField size="small" label="Search exam date & course code (e.g. CS1010, 21 Nov)" type="search" value={query}
+                onChange={event => {
+                    setQuery(event.target.value);
+                    tableRef.current.scrollTop = 0;
+                }}
+                sx={{ mb: 2, width: "100%" }}
+            />
 
             <TableContainer aria-label="Time table" ref={tableRef} component={Paper} sx={{ height: "66vh", border: 1, borderColor: "divider", borderRadius: 3, visibility: positioned ? "visible" : "hidden" }}>
                 <Table size="small" stickyHeader>
@@ -64,7 +79,11 @@ export default function Home() {
                             <TableCell sx={{ width: "50%", minWidth: 500 }}>Name</TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>{rows.map(row => {
+                    <TableBody>{visible.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={5} align="center" sx={{ color: "text.secondary" }}>No matching courses</TableCell>
+                        </TableRow>
+                    )}{visible.map(row => {
                         const parts = Object.fromEntries(dateFormat.formatToParts(row.start).map(({ type, value }) => [type, value]));
                         const rowColor = row.start.toISOString().slice(0, 10) < now.toISOString().slice(0, 10) ? "text.disabled"
                             : row.start.toISOString().slice(0, 10) > now.toISOString().slice(0, 10) ? "text.primary"
