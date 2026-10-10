@@ -18,13 +18,11 @@ export default function Home() {
             name: module.title
         };
     }));
-    const dateFormat = new Intl.DateTimeFormat("en-SG", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+    const dateFormat = new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
     const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
-    const terms = query.toUpperCase().split(/\s+/).filter(Boolean);
-    const visible = rows.filter(row => {
-        const text = `${dateFormat.format(row.start)} ${row.code}`.toUpperCase();
-        return terms.every(term => text.includes(term));
-    });
+    const visible = rows.filter(row =>
+        row.code.toUpperCase().startsWith(query.trim().toUpperCase()) || dateFormat.format(row.start).toUpperCase().startsWith(query.trim().toUpperCase())
+    );
 
     useEffect(() => {
         const target = rowRefs.current.get(rows.find(row => row.start.toISOString().slice(0, 10) >= now.toISOString().slice(0, 10)).id);
