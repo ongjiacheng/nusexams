@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
     const tableRef = useRef(null);
+    const headRef = useRef(null);
+    const rowRefs = useRef(new Map());
     const [positioned, setPositioned] = useState(false);
-    const now = new Date(Date.now() + 8 * 60 * 60_000);
+    const [now, setNow] = useState(() => new Date(Date.now() + 8 * 60 * 60_000));
     const rows = exams.flatMap(slot => slot.modules.map(module => {
         return {
             id: `${slot.examDate}-${module.moduleCode}`,
@@ -19,17 +21,21 @@ export default function Home() {
     const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
 
     useEffect(() => {
-        const nextExam = rows.find(row => row.end >= now);
-        if (!nextExam) {
-            setPositioned(true);
-            return;
+        const target = rowRefs.current.get(rows.find(row => row.start.toISOString().slice(0, 10) >= now.toISOString().slice(0, 10)).id);
+        if (target) {
+            tableRef.current.scrollTop += target.getBoundingClientRect().top - headRef.current.getBoundingClientRect().bottom;
         }
-
-        const container = tableRef.current;
-        const target = container.querySelector(`[data="${nextExam.id}"]`);
-        const header = container.querySelector("thead th");
-        container.scrollTop += target.getBoundingClientRect().top - header.getBoundingClientRect().bottom;
         setPositioned(true);
+    }, []);
+
+    useEffect(() => {
+        let timer;
+        const tick = () => {
+            setNow(new Date(Date.now() + 8 * 60 * 60_000));
+            timer = setTimeout(tick, 60_000 - (Date.now() % 60_000));
+        };
+        timer = setTimeout(tick, 60_000 - (Date.now() % 60_000));
+        return () => clearTimeout(timer);
     }, []);
 
     return (
@@ -49,7 +55,7 @@ export default function Home() {
 
             <TableContainer aria-label="Time table" ref={tableRef} component={Paper} sx={{ height: "66vh", border: 1, borderColor: "divider", borderRadius: 3, visibility: positioned ? "visible" : "hidden" }}>
                 <Table stickyHeader>
-                    <TableHead>
+                    <TableHead ref={headRef}>
                         <TableRow>
                             <TableCell sx={{ width: "20%", minWidth: 80 }}>Date</TableCell>
                             <TableCell sx={{ width: "10%", minWidth: 70 }}>Start</TableCell>
@@ -68,7 +74,7 @@ export default function Home() {
                                             : "success.dark";
                         const rowWeight = rowColor.includes("text") ? 400 : 700;
                         return (
-                            <TableRow hover key={row.id} data={row.id}>
+                            <TableRow hover key={row.id} ref={el => el ? rowRefs.current.set(row.id, el) : rowRefs.current.delete(row.id)}>
                                 <TableCell sx={{ color: rowColor, display: { xs: "table-cell", md: "none" }, fontWeight: rowWeight }}>
                                     {`${parts.day} ${parts.month}`}
                                 </TableCell>
