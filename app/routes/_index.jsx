@@ -8,25 +8,25 @@ export default function Home() {
     const rowRefs = useRef(new Map());
     const [positioned, setPositioned] = useState(false);
     const [query, setQuery] = useState("");
-    const [now, setNow] = useState(() => new Date(Date.now() + 8 * 60 * 60_000));
+    const [now, setNow] = useState(() => new Date());
     const rows = exams.flatMap(slot => slot.modules.map(module => {
         return {
             id: `${slot.examDate}-${module.moduleCode}`,
-            start: new Date(`${slot.examDate}Z`),
-            end: new Date(new Date(`${slot.examDate}Z`).getTime() + slot.examDuration * 60_000),
+            start: new Date(`${slot.examDate}`),
+            end: new Date(new Date(`${slot.examDate}`).getTime() + slot.examDuration * 60_000),
             code: module.moduleCode,
             name: module.title
         };
     }));
-    const dateFormat = new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-    const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
+    const dateFormat = new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" });
+    const timeFormat = new Intl.DateTimeFormat("en-SG", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Singapore" });
     const visible = rows.filter(row => {
         const keywords = [dateFormat.format(row.start), row.code, row.name].map(k => k.toUpperCase());
         return keywords.some(keyword => keyword.startsWith(query.trim().toUpperCase()));
     });
 
     useEffect(() => {
-        const target = rowRefs.current.get(rows.find(row => row.start.toISOString().slice(0, 10) >= now.toISOString().slice(0, 10)).id);
+        const target = rowRefs.current.get(rows.find(row => row.start.toLocaleDateString("en-CA", { timeZone: "Asia/Singapore" }) >= now.toLocaleDateString("en-CA", { timeZone: "Asia/Singapore" })).id);
         if (target) {
             tableRef.current.scrollTop += target.getBoundingClientRect().top - headRef.current.getBoundingClientRect().bottom;
         }
@@ -36,7 +36,7 @@ export default function Home() {
     useEffect(() => {
         let timer;
         const tick = () => {
-            setNow(new Date(Date.now() + 8 * 60 * 60_000));
+            setNow(new Date());
             timer = setTimeout(tick, 60_000 - (Date.now() % 60_000));
         };
         timer = setTimeout(tick, 60_000 - (Date.now() % 60_000));
@@ -80,8 +80,8 @@ export default function Home() {
                             <TableCell colSpan={5} align="center" sx={{ color: "text.secondary" }}>No matching courses</TableCell>
                         </TableRow>
                     )}{visible.map(row => {
-                        const rowColor = row.start.toISOString().slice(0, 10) < now.toISOString().slice(0, 10) ? "text.disabled"
-                            : row.start.toISOString().slice(0, 10) > now.toISOString().slice(0, 10) ? "text.primary"
+                        const rowColor = row.start.toLocaleDateString("en-CA", { timeZone: "Asia/Singapore" }) < now.toLocaleDateString("en-CA", { timeZone: "Asia/Singapore" }) ? "text.disabled"
+                            : row.start.toLocaleDateString("en-CA", { timeZone: "Asia/Singapore" }) > now.toLocaleDateString("en-CA", { timeZone: "Asia/Singapore" }) ? "text.primary"
                                 : row.end <= now ? "info.dark"
                                     : row.start <= now ? "error.dark"
                                         : (row.start - now) / 60_000 <= 30 ? "warning.dark"
@@ -90,10 +90,10 @@ export default function Home() {
                         return (
                             <TableRow hover key={row.id} ref={el => el ? rowRefs.current.set(row.id, el) : rowRefs.current.delete(row.id)}>
                                 <TableCell sx={{ color: rowColor, display: { xs: "table-cell", lg: "none" }, fontWeight: rowWeight }}>
-                                    {`${row.start.getDate()} ${row.start.toLocaleString('en-SG', { month: 'short' })}`}
+                                    {row.start.toLocaleDateString("en-SG", { day: "numeric", month: "short", timeZone: "Asia/Singapore" })}
                                 </TableCell>
                                 <TableCell sx={{ color: rowColor, display: { xs: "none", lg: "table-cell" }, fontWeight: rowWeight }}>
-                                    {`${row.start.getDate()} ${row.start.toLocaleString('en-SG', { month: 'short' })} ${row.start.getFullYear()} (${row.start.toLocaleDateString('en-SG', { weekday: 'short' })})`}
+                                    {`${row.start.toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Singapore" })} (${row.start.toLocaleDateString("en-SG", { weekday: "short", timeZone: "Asia/Singapore" })})`}
                                 </TableCell>
                                 <TableCell sx={{ color: rowColor, fontWeight: rowWeight }}>{timeFormat.format(row.start)}</TableCell>
                                 <TableCell sx={{ color: rowColor, fontWeight: rowWeight }}>{timeFormat.format(row.end)}</TableCell>
