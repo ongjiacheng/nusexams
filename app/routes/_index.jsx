@@ -93,10 +93,10 @@ export default function Home() {
                         return (
                             <TableRow hover key={row.id} ref={el => el ? rowRefs.current.set(row.id, el) : rowRefs.current.delete(row.id)}>
                                 <TableCell sx={{ color: rowColor, display: { xs: "table-cell", lg: "none" }, fontWeight: rowWeight }}>
-                                    {`${row.start.getDate()} ${row.start.toLocaleString('en-SG', { month: 'short' })}`}
+                                    {`${row.start.getUTCDate()} ${row.start.toLocaleString('en-SG', { month: 'short', timeZone: 'UTC' })}`}
                                 </TableCell>
                                 <TableCell sx={{ color: rowColor, display: { xs: "none", lg: "table-cell" }, fontWeight: rowWeight }}>
-                                    {`${row.start.getDate()} ${row.start.toLocaleString('en-SG', { month: 'short' })} ${row.start.getFullYear()} (${row.start.toLocaleDateString('en-SG', { weekday: 'short' })})`}
+                                    {`${row.start.getUTCDate()} ${row.start.toLocaleString('en-SG', { month: 'short', timeZone: 'UTC' })} ${row.start.getUTCFullYear()} (${row.start.toLocaleDateString('en-SG', { weekday: 'short', timeZone: 'UTC' })})`}
                                 </TableCell>
                                 <TableCell sx={{ color: rowColor, fontWeight: rowWeight }}>{timeFormat.format(row.start)}</TableCell>
                                 <TableCell sx={{ color: rowColor, fontWeight: rowWeight }}>{timeFormat.format(row.end)}</TableCell>
